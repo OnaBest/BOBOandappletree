@@ -66,8 +66,8 @@
     <div id="game-container">
         <div id="state-start" class="tree-layer active" style="background-image: url('图一.png');"></div>
         <div id="state-spring" class="tree-layer" style="background-image: url('图二.png');"></div>
-        <div id="state-summer" class="tree-layer" style="background-image: url('图三.png');"></div>
-        <div id="state-autumn" class="tree-layer" style="background-image: url('图四.png');"></div>
+        <div id="state-summer" class="tree-layer" style="background-image: url('图四.png');"></div>
+        <div id="state-autumn" class="tree-layer" style="background-image: url('图三.png');"></div>
         <div id="state-winter" class="tree-layer" style="background-image: url('图五.png');"></div>
     </div>
 
@@ -104,7 +104,7 @@
 
             if (command.includes("春")) {
                 document.getElementById('state-spring').classList.add('active');
-            } else if (command.includes("夏") || command.includes("花")) {
+            } else if (command.includes("夏") || command.includes("花") || command.includes("果")) {
                 document.getElementById('state-summer').classList.add('active');
             } else if (command.includes("秋")) {
                 document.getElementById('state-autumn').classList.add('active');
@@ -117,4 +117,3 @@
     </script>
 </body>
 </html>
-
