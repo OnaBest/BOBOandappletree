@@ -52,16 +52,12 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-            transition: background-color 0.3s;
         }
-
-        #voice-btn:active { background-color: #388E3C; }
 
         #status {
             margin-top: 15px;
             color: #555;
             font-weight: bold;
-            min-height: 1.2em;
         }
     </style>
 </head>
@@ -76,7 +72,7 @@
     </div>
 
     <button id="voice-btn">🎤 点击并说话</button>
-    <p id="status">等待指令：请说“春天”、“夏天”、“秋天”或“冬天”</p>
+    <p id="status">请说：“春天”、“夏天”、“秋天”或“冬天”</p>
 
     <script>
         const voiceBtn = document.getElementById('voice-btn');
@@ -90,16 +86,10 @@
         } else {
             const recognition = new SpeechRecognition();
             recognition.lang = 'zh-CN';
-            recognition.interimResults = false;
 
             voiceBtn.onclick = () => {
-                try {
-                    recognition.start();
-                    statusText.innerText = "正在倾听中...请说话";
-                    voiceBtn.style.opacity = "0.6";
-                } catch (e) {
-                    console.log("识别已在运行中");
-                }
+                recognition.start();
+                statusText.innerText = "正在倾听中...";
             };
 
             recognition.onresult = (event) => {
@@ -107,35 +97,21 @@
                 statusText.innerText = "识别结果：" + result;
                 updateTree(result);
             };
-
-            recognition.onerror = (event) => {
-                statusText.innerText = "识别出错: " + event.error;
-                voiceBtn.style.opacity = "1";
-            };
-
-            recognition.onend = () => {
-                voiceBtn.style.opacity = "1";
-            };
         }
 
         function updateTree(command) {
-            // 移除所有激活状态
             layers.forEach(l => l.classList.remove('active'));
 
-            // 语音指令匹配逻辑
             if (command.includes("春")) {
                 document.getElementById('state-spring').classList.add('active');
-            } else if (command.includes("夏") || command.includes("花") || command.includes("果")) {
-                // 此时支持“夏天”、“开花”或“结果”
+            } else if (command.includes("夏") || command.includes("花")) {
                 document.getElementById('state-summer').classList.add('active');
             } else if (command.includes("秋")) {
                 document.getElementById('state-autumn').classList.add('active');
             } else if (command.includes("冬")) {
                 document.getElementById('state-winter').classList.add('active');
             } else {
-                // 如果没听清，保留在当前状态或返回初始状态
                 document.getElementById('state-start').classList.add('active');
-                statusText.innerText = "没听清季节，试着说：春天、夏天、秋天、冬天";
             }
         }
     </script>
