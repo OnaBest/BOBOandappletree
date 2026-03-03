@@ -2,30 +2,35 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Bobo Bear 语音互动苹果树</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobo Bear 苹果树交互游戏</title>
     <style>
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f7f9fc;
-            font-family: sans-serif;
+            background-color: #f0f7f4;
+            font-family: "Microsoft YaHei", sans-serif;
         }
 
         #game-container {
             position: relative;
-            width: 500px;
-            height: 500px;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            width: 90vw;
+            max-width: 500px;
+            aspect-ratio: 1 / 1;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
         .tree-layer {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             background-size: contain;
@@ -38,19 +43,26 @@
         .active { opacity: 1; }
 
         #voice-btn {
-            margin-top: 30px;
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #ff6b6b;
+            margin-top: 25px;
+            padding: 15px 40px;
+            font-size: 20px;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: background-color 0.3s;
         }
 
-        #voice-btn:active { transform: scale(0.95); }
-        #status { margin-top: 10px; color: #666; font-size: 14px; }
+        #voice-btn:active { background-color: #388E3C; }
+
+        #status {
+            margin-top: 15px;
+            color: #555;
+            font-weight: bold;
+            min-height: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -58,60 +70,72 @@
     <div id="game-container">
         <div id="state-start" class="tree-layer active" style="background-image: url('图一.jpg');"></div>
         <div id="state-spring" class="tree-layer" style="background-image: url('图二.jpg');"></div>
-        <div id="state-flower" class="tree-layer" style="background-image: url('图三.jpg');"></div>
+        <div id="state-summer" class="tree-layer" style="background-image: url('图三.jpg');"></div>
         <div id="state-autumn" class="tree-layer" style="background-image: url('图四.jpg');"></div>
         <div id="state-winter" class="tree-layer" style="background-image: url('图五.jpg');"></div>
     </div>
 
-    <button id="voice-btn">🎤 点我开始说话</button>
-    <p id="status">点击按钮后请说：春天、开花、秋天 或 冬天</p>
+    <button id="voice-btn">🎤 点击并说话</button>
+    <p id="status">等待指令：请说“春天”、“夏天”、“秋天”或“冬天”</p>
 
     <script>
         const voiceBtn = document.getElementById('voice-btn');
         const statusText = document.getElementById('status');
         const layers = document.querySelectorAll('.tree-layer');
 
-        // 初始化 Web Speech API
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
+
         if (!SpeechRecognition) {
-            statusText.innerText = "您的浏览器不支持语音识别，请使用 Chrome。";
+            statusText.innerText = "抱歉，您的浏览器不支持语音识别，请换用 Chrome。";
         } else {
             const recognition = new SpeechRecognition();
-            recognition.lang = 'zh-CN'; // 设置为中文
-            recognition.continuous = false; // 识别一次后停止
+            recognition.lang = 'zh-CN';
+            recognition.interimResults = false;
 
             voiceBtn.onclick = () => {
-                recognition.start();
-                statusText.innerText = "正在倾听...";
-                voiceBtn.style.backgroundColor = "#4ecdc4";
+                try {
+                    recognition.start();
+                    statusText.innerText = "正在倾听中...请说话";
+                    voiceBtn.style.opacity = "0.6";
+                } catch (e) {
+                    console.log("识别已在运行中");
+                }
             };
 
             recognition.onresult = (event) => {
                 const result = event.results[0][0].transcript;
-                statusText.innerText = "你说的是: " + result;
+                statusText.innerText = "识别结果：" + result;
                 updateTree(result);
             };
 
+            recognition.onerror = (event) => {
+                statusText.innerText = "识别出错: " + event.error;
+                voiceBtn.style.opacity = "1";
+            };
+
             recognition.onend = () => {
-                voiceBtn.style.backgroundColor = "#ff6b6b";
+                voiceBtn.style.opacity = "1";
             };
         }
 
         function updateTree(command) {
+            // 移除所有激活状态
             layers.forEach(l => l.classList.remove('active'));
 
+            // 语音指令匹配逻辑
             if (command.includes("春")) {
                 document.getElementById('state-spring').classList.add('active');
-            } else if (command.includes("夏") || command.includes("果")) {
-                document.getElementById('state-flower').classList.add('active');
+            } else if (command.includes("夏") || command.includes("花") || command.includes("果")) {
+                // 此时支持“夏天”、“开花”或“结果”
+                document.getElementById('state-summer').classList.add('active');
             } else if (command.includes("秋")) {
                 document.getElementById('state-autumn').classList.add('active');
             } else if (command.includes("冬")) {
                 document.getElementById('state-winter').classList.add('active');
             } else {
+                // 如果没听清，保留在当前状态或返回初始状态
                 document.getElementById('state-start').classList.add('active');
-                statusText.innerText = "没听清，请再说一次季节名。";
+                statusText.innerText = "没听清季节，试着说：春天、夏天、秋天、冬天";
             }
         }
     </script>
