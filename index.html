@@ -71,8 +71,8 @@
         <div id="state-winter" class="tree-layer" style="background-image: url('图五.png');"></div>
     </div>
 
-    <button id="voice-btn">🎤 点击并说话</button>
-    <p id="status">请说：“春天”、“夏天”、“秋天”或“冬天”</p>
+    <button id="voice-btn">🎤 Press and Say</button>
+    <p id="status">请说：“Spring 春天”、“Summer 夏天”、“Fall 秋天”或“Winter 冬天”</p>
 
     <script>
         const voiceBtn = document.getElementById('voice-btn');
@@ -89,12 +89,12 @@
 
             voiceBtn.onclick = () => {
                 recognition.start();
-                statusText.innerText = "正在倾听中...";
+                statusText.innerText = "Listening...";
             };
 
             recognition.onresult = (event) => {
                 const result = event.results[0][0].transcript;
-                statusText.innerText = "识别结果：" + result;
+                statusText.innerText = "result：" + result;
                 updateTree(result);
             };
         }
@@ -119,4 +119,5 @@
     </script>
 </body>
 </html>
+
 
